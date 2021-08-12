@@ -167,16 +167,17 @@ md"-  $\theta$ average number of bees get born in an hour: $(@bind θ Slider(.25
 "
 
 # ╔═╡ 09fdb855-7b14-46f1-abcb-12533be12003
-md"The probability of waiting $k$ events in an interval in given by:
+md"The probability density of waiting $k$ events in an interval in given by:
 
 $f(x;\theta) = \frac{1}{\theta} e^{-\frac{x}{\theta}}$
 Where:
--  $f$ is the exponential probability.
+-  $f$ is the exponential probability density function.
 -  $x$ is the waiting time to observe.
 -  $\theta$ is the average number of events per interval of time (rate).
   Also called the scale parameter (in wikipedia appears as $\beta$).
 
 Notes:
+- This is a continuous distribution, note that the functions computes the probability density function (PDF) and not a probability as in the discrete case. This can be noted as the PDF can be bigger than $1$.
 - Another used notation is: $f(x;\lambda) = \lambda e^{-\lambda x}$
   , where $\theta = 1/\lambda$.
 - However, this may cause confusion given that the poisson distribution also uses
@@ -187,15 +188,20 @@ Notes:
 "
 
 # ╔═╡ 14bbe545-073a-47b3-aad3-5f62fb92c680
-"> Given that in average ``$θ`` bees get born in 1 hour (``\\theta``)
+"""> Given that in average ``$θ`` bees get born in 1 hour (``\\theta``)
 >
-> What's the probability to wait ``$x_exp`` hours until the next bee gets born?
-" |> Markdown.parse
+> What's the probability to wait at most ``$x_exp`` hours until the next bee gets born?
+>
+> (Notice the *"at most"*, since this is a continuous distribution we are using the cumulative function)
+""" |> Markdown.parse
 
 # ╔═╡ 6ca9fe46-f5d9-483e-a57b-82a595fa39b7
 begin
 	dist_exp = Exponential(θ)
-	Markdown.parse("\$\$f(x;\\theta) = f($x_exp;$θ) = \\frac{1}{$θ} e^{-\\frac{$x_exp}{$θ}} = $(pdf(dist_exp, x_exp) |> format_number)\$\$")
+	"
+- PDF: ``f(x;\\theta) = f($x_exp;$θ) = \\frac{1}{$θ} e^{-\\frac{$x_exp}{$θ}} = $(pdf(dist_exp, x_exp) |> format_number)``
+- CDF: ``F(x;\\theta) = F($x_exp;$θ) = 1 - e^{-\\frac{$x_exp}{$θ}} = $(cdf(dist_exp, x_exp) |> format_number)``
+	" |> Markdown.parse
 end
 
 # ╔═╡ 9fe32642-9601-40c7-921b-576b01ad9739
@@ -205,14 +211,14 @@ begin
 		title="Distribution as x changes (θ=$θ)",
 		xlabel=L"x", legend=:topleft)
 	plot!(xs_exp, cdf.(dist_exp, xs_exp), label="CDF")
-	scatter!([x_exp], [pdf(dist_exp,x_exp)], label=false)
+	scatter!([x_exp], [cdf(dist_exp,x_exp)], label=false)
 	
 	θs = 0.01:.2:10
 	p_exp_2 = plot(θs, map(θ -> pdf(Exponential(θ), x_exp), θs), label="PDF",
 		title="Distribution as θ changes (x=$x_exp)",
 		xlabel=L"\theta", legend=:topright)
 	plot!(θs, map(θ -> cdf.(Exponential(θ), x_exp), θs), label="CDF")
-	scatter!([θ], [pdf(Exponential(θ), x_exp)], label=false)
+	scatter!([θ], [cdf(Exponential(θ), x_exp)], label=false)
 	
 	plot(p_exp_1, p_exp_2, layout=(2,1))
 end
