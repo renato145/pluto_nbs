@@ -30,8 +30,8 @@ $\frac{dx}{dt} = -y(t)
 md"
 -  $x_0=$ $(@bind x0 Slider(-2:0.1:2, default=1, show_value=true))
 -  $y_0=$ $(@bind y0 Slider(-2:0.2:2, default=2, show_value=true))
--  $t=$ $(@bind ts Slider(0:25, default=15, show_value=true))
--  $step=$ $(@bind stepsz Slider(0.005:0.005:0.1, default=0.04, show_value=true))
+-  $t=$ $(@bind ts Slider(0:50, default=21, show_value=true))
+-  $step=$ $(@bind stepsz Slider(0.05:0.05:1., default=0.3, show_value=true))
 
 Notice that reducing the step size improves the precision of the calculations.
 "
@@ -50,8 +50,8 @@ md"## Functions"
 
 # ╔═╡ 650513a6-c36a-4c5e-80b4-d19dfbd41a9c
 begin
-	dx(y,t) = -y*t
-	dy(x,t) = x*t
+	dx(y, t=1e-3) = -y*t
+	dy(x, t=1e-3) = x*t
 end
 
 # ╔═╡ c389c04b-344c-4614-a09e-6699680ef70d
@@ -60,9 +60,9 @@ begin
 	y = y0
 	
 	p = plot(size=(600,300), xlims=(-10,10), ylims=(-10,10))
-	for t in range(0; length=ts+1, step=stepsz)
-		Δx = dx(y,t)
-		Δy = dy(x,t)
+	for _ in 1:ts
+		Δx = dx(y,stepsz)
+		Δy = dy(x,stepsz)
 		x += Δx
 		y += Δy
 		scatter!([x], [y], ms=5, c=:steelblue, label=false)
