@@ -31,6 +31,8 @@ md"## Summary
 - Binomial distribution: *What's the probability of getting $x$ successful events out of $n$ trials?*
 - Poisson distribution: *What's the probability of $k$ events occurring in some period of time?*
 - Exponential distribution: *What's the probability of waiting $x$ periods of time until an event occurs?*
+- Gamma distribution: *What's the probability of waiting $x$ periods of time until the $\textit{k-th}$ event occurs?*
+- Beta distribution: *TODO*
 "
 
 # ╔═╡ 15a770d6-7dbb-4135-ae6a-46afa8886876
@@ -192,7 +194,7 @@ Notes:
 >
 > What's the probability to wait at most ``$x_exp`` hours until the next bee gets born?
 >
-> (Notice the *"at most"*, since this is a continuous distribution we are using the cumulative function)
+> (Notice I mention *"at most"*, since this is a continuous distribution we are using the cumulative function)
 """ |> Markdown.parse
 
 # ╔═╡ 6ca9fe46-f5d9-483e-a57b-82a595fa39b7
@@ -236,7 +238,49 @@ end
 
 # ╔═╡ c03345c3-f46e-461d-aec7-80faf928f5dd
 md"## Gamma distribution
-> TODO"
+> The idea of the gamma distribution is to predict the amount of waiting time until the $\textit{k-th}$ event occurs.
+"
+
+# ╔═╡ a5b7c9ec-2dad-4817-9b08-2219a96d4cab
+md"The probability density of waiting $k$ events in an interval in given by:
+
+$f(x;\alpha,\theta) = \frac{x^{\alpha - 1} e^{-x/\theta}}{\Gamma(\alpha) \theta^\alpha}$
+Where:
+-  $f$ is the gamma probability density function.
+-  $x$ is the waiting time to observe.
+-  $\alpha$ is the ...
+-  $\theta$ is the average number of events per interval of time (rate).
+  Also called the scale parameter (in wikipedia appears as $\beta$).
+-  $\Gamma$ is the gamma function.
+
+Notes:
+- The gamma function is a continous aproximation of the factorial operation.
+  On positive integers is defined as: $\Gamma(k) = (k-1)!$
+"
+
+# ╔═╡ 20f60a6d-8522-4f77-aa74-6820f2d9707c
+md"The probability density of waiting $k$ events in an interval in given by:
+
+$f(x;\theta) = \frac{1}{\theta} e^{-\frac{x}{\theta}}$
+Where:
+-  $f$ is the exponential probability density function.
+-  $x$ is the waiting time to observe.
+-  $\theta$ is the average number of events per interval of time (rate).
+  Also called the scale parameter (in wikipedia appears as $\beta$).
+
+Notes:
+- This is a continuous distribution, note that the functions computes the probability density function (PDF) and not a probability as in the discrete case. This can be noted as the PDF can be bigger than $1$.
+- Another used notation is: $f(x;\lambda) = \lambda e^{-\lambda x}$
+  , where $\theta = 1/\lambda$.
+- However, this may cause confusion given that the poisson distribution also uses
+  $\lambda$ but they refer to different concepts:
+  - In the poisson distribution $\lambda$ is used as a **rate** (eg. $θ bees gets born in an hour).
+  - In the exponential distribution $\lambda$ is used as **time** (eg. a bee gets born every $(format_number(1/θ, 2)) hours).
+  -  $\theta$ here is equivalent to $\lambda$ used in poisson distribution.
+"
+
+# ╔═╡ 2e7592f9-1858-476c-9755-a96514138e17
+Gamma
 
 # ╔═╡ 18c5f6bd-7f2f-42c5-8f62-74c6d99642bd
 md"## Beta distribution
@@ -1178,7 +1222,10 @@ version = "0.9.1+5"
 # ╟─9fe32642-9601-40c7-921b-576b01ad9739
 # ╟─14b57a04-d366-441c-a735-255aa02b627d
 # ╟─11c2337b-c1e6-4dd5-a5a6-6343747bb980
-# ╟─c03345c3-f46e-461d-aec7-80faf928f5dd
+# ╠═c03345c3-f46e-461d-aec7-80faf928f5dd
+# ╠═a5b7c9ec-2dad-4817-9b08-2219a96d4cab
+# ╠═20f60a6d-8522-4f77-aa74-6820f2d9707c
+# ╠═2e7592f9-1858-476c-9755-a96514138e17
 # ╟─18c5f6bd-7f2f-42c5-8f62-74c6d99642bd
 # ╠═85168bce-d2d7-4083-806b-fb45f1e9aa68
 # ╟─00000000-0000-0000-0000-000000000001
