@@ -32,13 +32,13 @@ md"## Summary
 - Poisson distribution: *What's the probability of $k$ events occurring in some period of time?*
 - Exponential distribution: *What's the probability of waiting $x$ periods of time until an event occurs?*
 - Gamma distribution: *What's the probability of waiting $x$ periods of time until the $\textit{k-th}$ event occurs?*
-- Beta distribution: *TODO*
+- Beta distribution: *Given that we observed $\alpha$ wins and $\beta$ losses, How does the probabilty curve looks?*
 "
 
 # ╔═╡ 15a770d6-7dbb-4135-ae6a-46afa8886876
 md"## Binomial distribution
 
-$P_x = \binom{n}{x} p^x (1-p)^{n-x} = \frac{n!}{k!(n-k)!} p^x (1-p)^{n-x}$
+$P(x) = \binom{n}{x} p^x (1-p)^{n-x} = \frac{n!}{k!(n-k)!} p^x (1-p)^{n-x}$
 
 Where:
 -  $P$ is the binomial probability.
@@ -63,7 +63,7 @@ md"
 # ╔═╡ 0367ce88-7275-46f0-ba48-49a48bc2d182
 begin
 	dist_binomial = Binomial(n, p)
-	Markdown.parse("\$\$P = \\binom{$n}{$x} $(p)^{$x} $(1-p |> format_number)^{$(n-x)} ≈ $(pdf(dist_binomial,x) |> format_number)\$\$")
+	Markdown.parse("\$\$P($x) = \\binom{$n}{$x} $(p)^{$x} $(1-p |> format_number)^{$(n-x)} ≈ $(pdf(dist_binomial,x) |> format_number)\$\$")
 end
 
 # ╔═╡ 358925ea-83f5-48ca-bc8b-1ee52e86ded1
@@ -267,7 +267,7 @@ Notes:
 md"
 -  $\alpha$: number of bees we are waiting to get out of their nest $(@bind α Slider(1:10, default=5, show_value=true))
 -  $\theta$: average time to wait for a bee to get out of its nest $(@bind θ_gamma Slider(0.1:.1:2, default=0.2, show_value=true))
--  $x$: test of the number of hours to wait for the next $\alpha$ bees to go out: $(@bind x_gamma Slider(0.1:0.1:5, default=1, show_value=true))
+-  $x$: test of the number of hours to wait for the next $\alpha$ bees to go out $(@bind x_gamma Slider(0.1:0.1:5, default=1, show_value=true))
 "
 
 # ╔═╡ 70f0b3b8-ca92-4e01-b2fd-256f0c1d96a3
@@ -329,10 +329,72 @@ end
 
 # ╔═╡ 18c5f6bd-7f2f-42c5-8f62-74c6d99642bd
 md"## Beta distribution
-> TODO"
+> The idea of the beta distribution is to get a probability density function given a number $\alpha$ wins and $\beta$ losses.
+> As we will see, it's a probability of probabilities.
+"
 
 # ╔═╡ 85168bce-d2d7-4083-806b-fb45f1e9aa68
+md"The probability density that a given probability $x$ will give the results $\alpha$ and $\beta$ is given by:
 
+$f(x;\alpha,\beta) = \frac{x^{\alpha - 1} (1-x)^{\beta-1}}{B(\alpha,\beta)}$
+Where:
+-  $f$ is the beta probability density function.
+-  $x$ is probability we are testing.
+-  $\alpha$ is the number of win events.
+-  $\beta$ is the number of loss events.
+-  $B$ is the beta function, used for normalization to ensure the total probability is $1$.
+"
+
+# ╔═╡ ac6192c6-cb88-4e6e-b982-d6e181016ca2
+md"
+-  $\alpha$: number of heads observed $(@bind α_beta Slider(0.25:0.25:30, default=8, show_value=true))
+-  $\beta$: number of tails observed $(@bind β Slider(0.25:0.25:30, default=2, show_value=true))
+-  $x_0,x_1$: test that the probability of the coin to give head is between the values $(@bind x₀ Slider(0:0.05:1, default=0.75, show_value=true)) and $(@bind x₁ Slider(0:0.05:1, default=0.85, show_value=true))
+"
+
+# ╔═╡ 943e5cb5-ed76-4632-a902-a62ad99a41ea
+""" **Example:**
+> We tossed a coin ``$(α_beta + β)`` times and observe ``$α_beta`` heads and ``$β`` tails.
+>
+> What's the probability that the coin probability of give head is between ``$x₀`` and ``$x₁``?
+""" |> Markdown.parse
+
+# ╔═╡ 5928b76e-0297-4c26-afbc-ab1af97f030d
+begin
+	dist_beta = Beta(α_beta, β)
+	"
+``F(x_0 \\le x \\le x_1;\\alpha,\\beta) = F(x \\le x_1) - F(x \\le x_0)``
+
+``F(x \\le x_1) = F(x \\le $x₁) = $(cdf(dist_beta, x₁) |> format_number)``
+	
+``F(x \\le x_0) = F(x \\le $x₀) = $(cdf(dist_beta, x₀) |> format_number)``
+
+``F($x₀ \\le x \\le $x₁;$α_beta,$β) = $(cdf(dist_beta, x₁) |> format_number) - $(cdf(dist_beta, x₀) |> format_number) = $((cdf(dist_beta, x₁) - cdf(dist_beta, x₀)) |> format_number)``
+" |> Markdown.parse
+end
+
+# ╔═╡ dfcb1ca9-1efc-4baf-8f4a-bd6b18b7b261
+begin
+	xs_beta = 0:0.01:1
+	xs_beta_fill = x₀:0.01:x₁
+	plot(xs_beta, pdf.(dist_beta, xs_beta), label="PDF", legend=:topleft, lw=2,
+		title="Beta distribution", xlabel=L"x", size=(600,300))
+	plot!(xs_beta, cdf.(dist_beta, xs_beta), label="CDF", lw=2)
+	plot!(xs_beta_fill, pdf.(dist_beta, xs_beta_fill), label=false, lw=0,
+		fill=0, fillalpha=0.15)
+end
+
+# ╔═╡ 9540ee66-06ed-43ab-b734-aabd8413ab31
+@bind go_beta Button("Do sample")
+
+# ╔═╡ 3c30ac98-b947-4b1e-9517-c3302b790ce3
+begin
+	go_beta
+	histogram(rand(dist_beta, 1000), label=false, size=(600,150),
+		title="Histogram of 1000 samples from the distribution",
+		legend=:topleft)
+	vline!([mean(dist_beta)], linewidth=2, linestyle=:dash, label=L"E[f(x;\alpha,\beta)]")
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1275,6 +1337,12 @@ version = "0.9.1+5"
 # ╟─15273c32-857c-4656-a8ae-328a13add84a
 # ╟─b3e2c8e7-4fc1-472f-aebe-5a8ca0548984
 # ╟─18c5f6bd-7f2f-42c5-8f62-74c6d99642bd
-# ╠═85168bce-d2d7-4083-806b-fb45f1e9aa68
+# ╟─85168bce-d2d7-4083-806b-fb45f1e9aa68
+# ╟─943e5cb5-ed76-4632-a902-a62ad99a41ea
+# ╟─5928b76e-0297-4c26-afbc-ab1af97f030d
+# ╟─ac6192c6-cb88-4e6e-b982-d6e181016ca2
+# ╟─dfcb1ca9-1efc-4baf-8f4a-bd6b18b7b261
+# ╟─9540ee66-06ed-43ab-b734-aabd8413ab31
+# ╟─3c30ac98-b947-4b1e-9517-c3302b790ce3
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
