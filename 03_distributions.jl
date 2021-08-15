@@ -48,14 +48,14 @@ Where:
 "
 
 # ╔═╡ a550c975-4fce-43c3-8369-ffa841a24d78
-md"-  $p$ probability of success: $(@bind p Slider(0:0.1:1, default=0.5))
--  $n$ number of trials: $(@bind n Slider(1:20, default=6))"
-
-# ╔═╡ b7a67388-bc93-44e3-b1fa-f571e7fa0d3d
-md"-  $x$ number of success: $(@bind x Slider(1:n, default=5))"
+md"
+-  $p$: probability of success $(@bind p Slider(0:0.1:1, default=0.5, show_value=true))
+-  $n$: number of trials $(@bind n Slider(1:20, default=6, show_value=true))
+-  $x$: test of the number of success to observe $(@bind x Slider(1:20, default=5, show_value=true))"
 
 # ╔═╡ c97d5a2a-edcb-41e2-a3a2-9fb4d59facec
-"> With a probabilty of getting head ``p = $p``
+" **Example:**
+> With a probabilty of getting head ``p = $p``
 > 
 > What's the probability ``P`` that a coin flips head ``$x`` times out of ``$n``?
 " |> Markdown.parse
@@ -74,7 +74,7 @@ begin
 		xlabel=L"x", legend=:topleft)
 	plot!(xs, cdf.(dist_binomial, xs), label="CDF")
 	scatter!([x], [pdf(dist_binomial,x)], label=false)
-	ps = 0:0.1:1
+	ps = 0:0.05:1
 	p2 = plot(ps, map(p -> pdf(Binomial(n,p), x), ps), label="PDF",
 		title="Distribution as p changes (x=$x)",
 		xlabel=L"p", legend=:topright)
@@ -110,14 +110,15 @@ Where:
 "
 
 # ╔═╡ cdbabe18-55ac-4b92-8e81-7c99f2443f10
-md"-  $λ$ average number of bees get born in an hour: $(@bind λ Slider(1:25, default=10))
--  $k$ number of bees to get born: $(@bind k Slider(1:25, default=5))
+md"-  $λ$: average number of bees going out of their nest every hour $(@bind λ Slider(1:25, default=10, show_value=true))
+-  $k$: test of the number of bees to get out in the next hour $(@bind k Slider(1:25, default=5, show_value=true))
 "
 
 # ╔═╡ f3550c01-2517-4b8e-a4b2-48d13e2f5a96
-"> Given that in average ``$λ`` bees get born in 1 hour (``λ``)
+" **Example:**
+> Given that in average ``$λ`` bees goes out of their nest every hour ``(λ)``.
 >
-> What's the probability that ``$k`` bees get born in the next hour?
+> What's the probability that ``$k`` bees goes out in the next hour?
 " |> Markdown.parse
 
 # ╔═╡ 1d69298e-be92-4823-bf75-730b9ccf0a7e
@@ -160,12 +161,13 @@ end
 # ╔═╡ b8082add-f6a5-43a9-af5d-73f646f51b36
 md"## Exponential distribution
 > The idea of the exponential distribution is to predict the amount of waiting time until the next event.
-> If the number of events follows a poisson distribution, then the waiting times will follow an exponential distribution.
+> If the number of events follows a poisson distribution, then, the waiting times will follow an exponential distribution.
 "
 
 # ╔═╡ fef4047e-7533-40fb-be0c-d934238d935e
-md"-  $\theta$ average number of bees get born in an hour: $(@bind θ Slider(.25:.25:5, default=2))
--  $x$ hours to wait: $(@bind x_exp Slider(0.1:0.1:5, default=0.5))
+md"
+-  $\theta$: average number of bees that goes out of their next every hour $(@bind θ Slider(.25:.25:5, default=2, show_value=true))
+-  $x$: test of the number of hours to wait for the next bee to go out $(@bind x_exp Slider(0.1:0.1:5, default=0.5, show_value=true))
 "
 
 # ╔═╡ 09fdb855-7b14-46f1-abcb-12533be12003
@@ -190,9 +192,10 @@ Notes:
 "
 
 # ╔═╡ 14bbe545-073a-47b3-aad3-5f62fb92c680
-"""> Given that in average ``$θ`` bees get born in 1 hour (``\\theta``)
+""" **Example:**
+> Given that in average ``$θ`` bees goes out of their nest every hour (``\\theta``)
 >
-> What's the probability to wait at most ``$x_exp`` hours until the next bee gets born?
+> What's the probability to wait at most ``$x_exp`` hours until the next bee gets out?
 >
 > (Notice I mention *"at most"*, since this is a continuous distribution we are using the cumulative function)
 """ |> Markdown.parse
@@ -202,7 +205,7 @@ begin
 	dist_exp = Exponential(θ)
 	"
 - PDF: ``f(x;\\theta) = f($x_exp;$θ) = \\frac{1}{$θ} e^{-\\frac{$x_exp}{$θ}} = $(pdf(dist_exp, x_exp) |> format_number)``
-- CDF: ``F(x;\\theta) = F($x_exp;$θ) = 1 - e^{-\\frac{$x_exp}{$θ}} = $(cdf(dist_exp, x_exp) |> format_number)``
+- CDF: ``F(x;\\theta) = F($x_exp;$θ) = 1 - e^{-\\frac{$x_exp}{$θ}} = $(cdf(dist_exp, x_exp) |> format_number)`` ← (our answer)
 	" |> Markdown.parse
 end
 
@@ -239,48 +242,90 @@ end
 # ╔═╡ c03345c3-f46e-461d-aec7-80faf928f5dd
 md"## Gamma distribution
 > The idea of the gamma distribution is to predict the amount of waiting time until the $\textit{k-th}$ event occurs.
+> If the number of events follows a poisson distribution, then, the wait time until the $\textit{k-th}$ event occurs will follow a gamma distribution.
 "
 
 # ╔═╡ a5b7c9ec-2dad-4817-9b08-2219a96d4cab
-md"The probability density of waiting $k$ events in an interval in given by:
+md"The probability density of waiting $\alpha$ events in an interval in given by:
 
 $f(x;\alpha,\theta) = \frac{x^{\alpha - 1} e^{-x/\theta}}{\Gamma(\alpha) \theta^\alpha}$
 Where:
 -  $f$ is the gamma probability density function.
 -  $x$ is the waiting time to observe.
--  $\alpha$ is the ...
--  $\theta$ is the average number of events per interval of time (rate).
-  Also called the scale parameter (in wikipedia appears as $\beta$).
+-  $\alpha$ is the number of events we are waiting for (shape parameter).
+-  $\theta$ is the average mean wait time (scale parameter).
 -  $\Gamma$ is the gamma function.
 
 Notes:
-- The gamma function is a continous aproximation of the factorial operation.
+- The gamma function is an approximation of the factorial operation for continous numbers.
   On positive integers is defined as: $\Gamma(k) = (k-1)!$
+- Another used notation is: $f(x;\alpha,\beta) = \frac{\beta^\alpha x^{\alpha-1} e^{-\beta x}}{\Gamma(\alpha)}$, where $\beta = 1 / \theta$.
+- As we seen in the exponential distribution, the notation changes according to preference. Where $\beta$ formulates the problem based on **rate** and $\theta$ based on **time**.
 "
 
-# ╔═╡ 20f60a6d-8522-4f77-aa74-6820f2d9707c
-md"The probability density of waiting $k$ events in an interval in given by:
-
-$f(x;\theta) = \frac{1}{\theta} e^{-\frac{x}{\theta}}$
-Where:
--  $f$ is the exponential probability density function.
--  $x$ is the waiting time to observe.
--  $\theta$ is the average number of events per interval of time (rate).
-  Also called the scale parameter (in wikipedia appears as $\beta$).
-
-Notes:
-- This is a continuous distribution, note that the functions computes the probability density function (PDF) and not a probability as in the discrete case. This can be noted as the PDF can be bigger than $1$.
-- Another used notation is: $f(x;\lambda) = \lambda e^{-\lambda x}$
-  , where $\theta = 1/\lambda$.
-- However, this may cause confusion given that the poisson distribution also uses
-  $\lambda$ but they refer to different concepts:
-  - In the poisson distribution $\lambda$ is used as a **rate** (eg. $θ bees gets born in an hour).
-  - In the exponential distribution $\lambda$ is used as **time** (eg. a bee gets born every $(format_number(1/θ, 2)) hours).
-  -  $\theta$ here is equivalent to $\lambda$ used in poisson distribution.
+# ╔═╡ 9546c7be-274c-41cb-a6a5-529226206fa1
+md"
+-  $\alpha$: number of bees we are waiting to get out of their nest $(@bind α Slider(1:10, default=5, show_value=true))
+-  $\theta$: average time to wait for a bee to get out of its nest $(@bind θ_gamma Slider(0.1:.1:2, default=0.2, show_value=true))
+-  $x$: test of the number of hours to wait for the next $\alpha$ bees to go out: $(@bind x_gamma Slider(0.1:0.1:5, default=1, show_value=true))
 "
 
-# ╔═╡ 2e7592f9-1858-476c-9755-a96514138e17
-Gamma
+# ╔═╡ 70f0b3b8-ca92-4e01-b2fd-256f0c1d96a3
+""" **Example:**
+> Given that in average a bee gets out its nest every ``$θ_gamma`` hours (``\\theta``)
+>
+> What's the probability to wait at most ``$x_gamma`` hours for ``$α`` bees to get our of their nest?
+>
+> (Notice I mention *"at most"*, since this is a continuous distribution we are using the cumulative function)
+""" |> Markdown.parse
+
+# ╔═╡ b5ea27d5-f00b-45a9-954b-46740696db74
+begin
+	dist_gamma = Gamma(α, θ_gamma)
+	"
+- PDF: ``f(x;\\alpha,\\theta) = f($x_gamma;$α,$θ_gamma) = \\frac{$x^{$α-1} e^{-$x_gamma/$θ_gamma}}{\\Gamma($α)$θ_gamma^$α} = $(pdf(dist_gamma, x_gamma) |> format_number)``
+- CDF: ``F(x;\\alpha,\\theta) = F($x_gamma;$α,$θ_gamma) = \\frac{\\gamma($α,$x_gamma/$θ_gamma)}{\\Gamma($α)} = $(cdf(dist_gamma, x_gamma) |> format_number)`` ← (our answer)
+" |> Markdown.parse
+end
+
+# ╔═╡ f9471d15-e59f-4d36-a8f4-2e2f52cc1b11
+begin
+	xs_gamma = 0:0.1:5
+	p_gamma_1 = plot(xs_gamma, pdf.(dist_gamma, xs_gamma), label="PDF",
+		title="Distribution as x changes (α=$α, θ=$θ_gamma)",
+		xlabel=L"x", legend=:bottomright)
+	plot!(xs_gamma, cdf.(dist_gamma, xs_gamma), label="CDF")
+	scatter!([x_gamma], [cdf(dist_gamma,x_gamma)], label=false)
+	
+	αs = 0.01:.1:10
+	p_gamma_2 = plot(αs, map(α -> pdf(Gamma(α,θ_gamma), x_gamma), αs),
+		label="PDF",
+		title="Distribution as α changes (θ=$θ_gamma, x=$x_gamma)",
+		xlabel=L"\alpha", legend=:topright)
+	plot!(αs, map(α -> cdf.(Gamma(α,θ_gamma), x_gamma), αs), label="CDF")
+	scatter!([α], [cdf(Gamma(α,θ_gamma), x_gamma)], label=false)
+	
+	θs_gamma = 0.01:.02:2
+	p_gamma_3 = plot(θs_gamma, map(θ -> pdf(Gamma(α,θ), x_gamma), θs_gamma),
+		label="PDF",
+		title="Distribution as θ changes (α=$α, x=$x_gamma)",
+		xlabel=L"\theta", legend=:topright)
+	plot!(θs_gamma, map(θ -> cdf.(Gamma(α,θ), x_gamma), θs_gamma), label="CDF")
+	scatter!([θ_gamma], [cdf(Gamma(α,θ_gamma), x_gamma)], label=false)
+	
+	plot(p_gamma_1, p_gamma_2, p_gamma_3, layout=(3,1), size=(600,600))
+end
+
+# ╔═╡ 15273c32-857c-4656-a8ae-328a13add84a
+@bind go_gamma Button("Do sample")
+
+# ╔═╡ b3e2c8e7-4fc1-472f-aebe-5a8ca0548984
+begin
+	go_gamma
+	histogram(rand(dist_gamma, 1000), label=false, size=(600,150),
+		title="Histogram of 1000 samples from the distribution")
+	vline!([mean(dist_gamma)], linewidth=2, linestyle=:dash, label=L"E[f(x;\alpha,\theta)]")
+end
 
 # ╔═╡ 18c5f6bd-7f2f-42c5-8f62-74c6d99642bd
 md"## Beta distribution
@@ -1200,32 +1245,35 @@ version = "0.9.1+5"
 # ╟─17f8998e-bc4b-4acc-8f0c-262d9ad087ee
 # ╟─15a770d6-7dbb-4135-ae6a-46afa8886876
 # ╟─c97d5a2a-edcb-41e2-a3a2-9fb4d59facec
-# ╟─a550c975-4fce-43c3-8369-ffa841a24d78
-# ╟─b7a67388-bc93-44e3-b1fa-f571e7fa0d3d
 # ╟─0367ce88-7275-46f0-ba48-49a48bc2d182
+# ╟─a550c975-4fce-43c3-8369-ffa841a24d78
 # ╟─358925ea-83f5-48ca-bc8b-1ee52e86ded1
 # ╟─4fc91165-28ea-41f6-86aa-89ba1453de68
 # ╟─3ac94b0a-39ef-413b-b1c6-beea66f401a0
 # ╟─52c3c8bf-e53d-4617-a825-f57615a7168b
 # ╟─78ceddb5-04e3-492a-b3a7-78138dfc02c0
 # ╟─f3550c01-2517-4b8e-a4b2-48d13e2f5a96
-# ╟─cdbabe18-55ac-4b92-8e81-7c99f2443f10
 # ╟─1d69298e-be92-4823-bf75-730b9ccf0a7e
+# ╟─cdbabe18-55ac-4b92-8e81-7c99f2443f10
 # ╟─765bbf8b-00c7-44f7-a3e2-f214400123a6
 # ╟─02d255a9-1e39-4412-a402-645d551afe14
 # ╟─b254beba-2119-428e-8d30-7aad3697e957
 # ╟─b8082add-f6a5-43a9-af5d-73f646f51b36
 # ╟─09fdb855-7b14-46f1-abcb-12533be12003
 # ╟─14bbe545-073a-47b3-aad3-5f62fb92c680
-# ╟─fef4047e-7533-40fb-be0c-d934238d935e
 # ╟─6ca9fe46-f5d9-483e-a57b-82a595fa39b7
+# ╟─fef4047e-7533-40fb-be0c-d934238d935e
 # ╟─9fe32642-9601-40c7-921b-576b01ad9739
 # ╟─14b57a04-d366-441c-a735-255aa02b627d
 # ╟─11c2337b-c1e6-4dd5-a5a6-6343747bb980
-# ╠═c03345c3-f46e-461d-aec7-80faf928f5dd
-# ╠═a5b7c9ec-2dad-4817-9b08-2219a96d4cab
-# ╠═20f60a6d-8522-4f77-aa74-6820f2d9707c
-# ╠═2e7592f9-1858-476c-9755-a96514138e17
+# ╟─c03345c3-f46e-461d-aec7-80faf928f5dd
+# ╟─a5b7c9ec-2dad-4817-9b08-2219a96d4cab
+# ╟─70f0b3b8-ca92-4e01-b2fd-256f0c1d96a3
+# ╟─b5ea27d5-f00b-45a9-954b-46740696db74
+# ╟─9546c7be-274c-41cb-a6a5-529226206fa1
+# ╟─f9471d15-e59f-4d36-a8f4-2e2f52cc1b11
+# ╟─15273c32-857c-4656-a8ae-328a13add84a
+# ╟─b3e2c8e7-4fc1-472f-aebe-5a8ca0548984
 # ╟─18c5f6bd-7f2f-42c5-8f62-74c6d99642bd
 # ╠═85168bce-d2d7-4083-806b-fb45f1e9aa68
 # ╟─00000000-0000-0000-0000-000000000001
