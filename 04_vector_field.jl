@@ -33,7 +33,7 @@ md"
 -  $t=$ $(@bind ts Slider(0:50, default=21, show_value=true))
 -  $step=$ $(@bind stepsz Slider(0.05:0.05:1., default=0.3, show_value=true))
 
-Notice that reducing the step size improves the precision of the calculations.
+Notice that reducing the step size improves the precision of the calculations, but still we can't get an exact solution.
 "
 
 # ╔═╡ eb1a3a7c-bf21-48c2-8362-e2d296e6e941
@@ -82,8 +82,10 @@ begin
 	tspan = (0.0, 10.0)
 	prob = ODEProblem(equation, u0, tspan)
 	sol = solve(prob)
-	plot(sol, vars=(1,2), size=(600,300), xlims=(-10,10), ylims=(-10,10),
-		title="Using DifferentialEquations.jl", leg=false)
+	plot_de = plot(sol, vars=(1,2), size=(600,300), xlims=(-10,10), ylims=(-10,10),
+		leg=false)
+	md"Using DifferentialEquations.jl we can get a more exact solution:
+	$plot_de"
 end
 
 # ╔═╡ 54154971-8194-4fff-af41-03e536d5b84a
@@ -97,7 +99,7 @@ begin
 	scatter!(xs, ys, ms=3, msw=0)
 	quiver!(xs, ys, quiver=(dxs,dys))
 	
-	md"In the plot above we have followed the trajectory of one starting point. If we show a grid, we can think of each point as a different starting point:
+	md"In the plots above we followed the trajectory of one starting point. If we show a grid, we can think of each point as a different starting point and show the direction they will follow:
 
 $(p2)"
 end
@@ -118,7 +120,9 @@ begin
 	dys_norm = dys ./ norms
 	colors = get_colors(norms, :inferno)
 	quiver!(xs.-(dxs_norm./2), ys.-(dys_norm./2), quiver=(dxs_norm, dys_norm), c=colors, lw=1.5)
-	md"Now, we can forget about the initial points,and to correctly plot the vector field we do:
+	plot!(sol, vars=(1,2), lw=4, c=:white, alpha=0.5,
+	xlims=(-3.1,3.1), ylims=(-3.1,3.1))
+	md"Now, we can forget about the initial points,and to correctly plot the vector field we:
 1. Center the direction of the arrows on the inital points.
 2. Color the arrows based on their magnitude.
 	
@@ -167,9 +171,9 @@ version = "0.1.0"
 
 [[ArrayInterface]]
 deps = ["IfElse", "LinearAlgebra", "Requires", "SparseArrays", "Static"]
-git-tree-sha1 = "045ff5e1bc8c6fb1ecb28694abba0a0d55b5f4f5"
+git-tree-sha1 = "cdb00a6fb50762255021e5571cf95df3e1797a51"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "3.1.17"
+version = "3.1.23"
 
 [[ArrayLayouts]]
 deps = ["FillArrays", "LinearAlgebra", "SparseArrays"]
@@ -205,12 +209,6 @@ version = "1.0.6+5"
 git-tree-sha1 = "215a9aa4a1f23fbd05b92769fdd62559488d70e9"
 uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 version = "0.4.1"
-
-[[CPUSummary]]
-deps = ["Hwloc", "IfElse", "Static"]
-git-tree-sha1 = "b3ce76887735be3e9adbb3eb967676a586694343"
-uuid = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
-version = "0.1.1"
 
 [[CSTParser]]
 deps = ["Tokenize"]
@@ -346,9 +344,9 @@ uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[DiffEqBase]]
 deps = ["ArrayInterface", "ChainRulesCore", "DEDataArrays", "DataStructures", "Distributions", "DocStringExtensions", "FastBroadcast", "ForwardDiff", "FunctionWrappers", "IterativeSolvers", "LabelledArrays", "LinearAlgebra", "Logging", "MuladdMacro", "NonlinearSolve", "Parameters", "PreallocationTools", "Printf", "RecursiveArrayTools", "RecursiveFactorization", "Reexport", "Requires", "SciMLBase", "Setfield", "SparseArrays", "StaticArrays", "Statistics", "SuiteSparse", "ZygoteRules"]
-git-tree-sha1 = "3418905154ab71db0634e1e9069faa4e115507c6"
+git-tree-sha1 = "7ff5c84464066d209796c42c8a0f8b3c8b41be72"
 uuid = "2b5f629d-d688-5b77-993f-72d75c75574e"
-version = "6.72.2"
+version = "6.72.1"
 
 [[DiffEqCallbacks]]
 deps = ["DataStructures", "DiffEqBase", "ForwardDiff", "LinearAlgebra", "NLsolve", "OrdinaryDiffEq", "RecipesBase", "RecursiveArrayTools", "StaticArrays"]
@@ -597,12 +595,6 @@ deps = ["Base64", "Dates", "IniFile", "Logging", "MbedTLS", "NetworkOptions", "S
 git-tree-sha1 = "44e3b40da000eab4ccb1aecdc4801c040026aeb5"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 version = "0.9.13"
-
-[[HostCPUFeatures]]
-deps = ["IfElse", "Libdl", "Static"]
-git-tree-sha1 = "e86382a874edd4ff47fd1373e03f38302af93345"
-uuid = "3e5b6fbb-0976-4d2c-9146-d79de83f2fb0"
-version = "0.1.2"
 
 [[Hwloc]]
 deps = ["Hwloc_jll"]
@@ -861,9 +853,9 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[ModelingToolkit]]
 deps = ["AbstractTrees", "ArrayInterface", "ConstructionBase", "DataStructures", "DiffEqBase", "DiffEqCallbacks", "DiffEqJump", "DiffRules", "Distributed", "Distributions", "DocStringExtensions", "DomainSets", "IfElse", "InteractiveUtils", "JuliaFormatter", "LabelledArrays", "Latexify", "Libdl", "LightGraphs", "LinearAlgebra", "MacroTools", "NaNMath", "NonlinearSolve", "RecursiveArrayTools", "Reexport", "Requires", "RuntimeGeneratedFunctions", "SafeTestsets", "SciMLBase", "Serialization", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "SymbolicUtils", "Symbolics", "UnPack", "Unitful"]
-git-tree-sha1 = "f05d892cf925b0952f0af251f2eabafdf1fb6cec"
+git-tree-sha1 = "a010f2fab54db3cafb01be9d76e4b00a9e1878ca"
 uuid = "961ee093-0014-501f-94e3-6117800e7a78"
-version = "6.3.0"
+version = "6.2.2"
 
 [[MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
@@ -964,9 +956,9 @@ version = "1.4.1"
 
 [[OrdinaryDiffEq]]
 deps = ["Adapt", "ArrayInterface", "DataStructures", "DiffEqBase", "DocStringExtensions", "ExponentialUtilities", "FastClosures", "FiniteDiff", "ForwardDiff", "LinearAlgebra", "Logging", "LoopVectorization", "MacroTools", "MuladdMacro", "NLsolve", "Polyester", "RecursiveArrayTools", "Reexport", "SparseArrays", "SparseDiffTools", "StaticArrays", "UnPack"]
-git-tree-sha1 = "98c845f13545647ff06effb53b0c0f7ddb721be4"
+git-tree-sha1 = "1600070fd4b87cda72a7c22a9ad8f3eec43e72ec"
 uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
-version = "5.62.0"
+version = "5.61.1"
 
 [[PCRE_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1173,9 +1165,9 @@ version = "0.0.1"
 
 [[SciMLBase]]
 deps = ["ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "RecipesBase", "RecursiveArrayTools", "StaticArrays", "Statistics", "Tables", "TreeViews"]
-git-tree-sha1 = "a89adabe1286c8edb6ae819037a6f5a32332adb7"
+git-tree-sha1 = "f4bcc1bc78857e0602de2ec548b08ac73bf29acc"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "1.18.5"
+version = "1.18.4"
 
 [[Scratch]]
 deps = ["Dates"]
@@ -1235,9 +1227,9 @@ version = "1.6.1"
 
 [[Static]]
 deps = ["IfElse"]
-git-tree-sha1 = "2740ea27b66a41f9d213561a04573da5d3823d4b"
+git-tree-sha1 = "62701892d172a2fa41a1f829f66d2b0db94a9a63"
 uuid = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
-version = "0.2.5"
+version = "0.3.0"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
@@ -1404,10 +1396,10 @@ uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
 version = "1.9.0"
 
 [[VectorizationBase]]
-deps = ["ArrayInterface", "CPUSummary", "HostCPUFeatures", "Hwloc", "IfElse", "Libdl", "LinearAlgebra", "Static"]
-git-tree-sha1 = "0e940546f8ad51f53966c866db14ff9b58be24e0"
+deps = ["ArrayInterface", "Hwloc", "IfElse", "Libdl", "LinearAlgebra", "Static"]
+git-tree-sha1 = "32a3252a00a8e4aa23129e2c36a237e812f71eeb"
 uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
-version = "0.20.34"
+version = "0.20.33"
 
 [[VertexSafeGraphs]]
 deps = ["LightGraphs"]
@@ -1636,11 +1628,11 @@ version = "0.9.1+5"
 # ╠═0f8e88fa-fc36-11eb-39dc-7d6f7d8e9a0e
 # ╟─a97d10c0-f4c5-40f2-832b-95e5d0944091
 # ╟─eb1a3a7c-bf21-48c2-8362-e2d296e6e941
-# ╟─bfa05946-4df4-4f4c-b8d8-039d6022be4a
-# ╟─c389c04b-344c-4614-a09e-6699680ef70d
-# ╟─ef066e5c-5ee1-4535-8b92-d3f0da676e27
-# ╟─54154971-8194-4fff-af41-03e536d5b84a
-# ╟─e76bb5ad-457e-42b1-945e-9026cce6eb52
+# ╠═bfa05946-4df4-4f4c-b8d8-039d6022be4a
+# ╠═c389c04b-344c-4614-a09e-6699680ef70d
+# ╠═ef066e5c-5ee1-4535-8b92-d3f0da676e27
+# ╠═54154971-8194-4fff-af41-03e536d5b84a
+# ╠═e76bb5ad-457e-42b1-945e-9026cce6eb52
 # ╟─41a5da4c-0b49-4154-8504-7453c202b2ec
 # ╠═650513a6-c36a-4c5e-80b4-d19dfbd41a9c
 # ╠═cf927d21-85c4-47f6-9438-b35c8be1c1f6
